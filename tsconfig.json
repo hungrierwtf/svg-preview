@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"baseUrl": "./src",
+		"lib": [ "DOM", "DOM.Iterable", "ESNext" ],
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"paths": {
+			"~*": [ "./*" ]
+		},
+		"target": "ES2017",
+		"sourceMap": true
+	}
+}

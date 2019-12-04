@@ -1,0 +1,23 @@
+{
+	"name": "svg-preview",
+	"version": "0.0.0",
+	"license": "MIT",
+	"scripts": {
+		"clean": "rimraf dist",
+		"deploy": "gh-pages -d dist",
+		"dist": "yarn clean && yarn build && yarn deploy",
+		"dev": "parcel src/index.html",
+		"build": "parcel build src/index.html"
+	},
+	"devDependencies": {
+		"gh-pages": "^2.1.1",
+		"monaco-editor": "^0.18.1",
+		"monaco-languages": "^1.8.0",
+		"normalize-scss": "^7.0.1",
+		"parcel-bundler": "^1.12.4",
+		"rimraf": "^3.0.0",
+		"rxjs": "^6.5.3",
+		"sass": "^1.23.7",
+		"typescript": "^3.7.3"
+	}
+}
