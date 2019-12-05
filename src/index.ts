@@ -52,6 +52,7 @@ self[ 'MonacoEnvironment' ] = {
 };
 
 const storage = localStorage;
+const sender = 'index.ts';
 
 ( async () => {
 	const svgEditor = editor.create( document.getElementById( 'editor' ), {
@@ -59,14 +60,19 @@ const storage = localStorage;
 </svg>
 `,
 		language: 'xml',
+		automaticLayout: true,
+		formatOnPaste: true,
+		formatOnType: true,
 		renderWhitespace: 'boundary'
 	} );
 	const model = svgEditor.getModel();
 	model.updateOptions( options );
-	svgEditor.trigger( 'index.ts', 'editor.action.formatDocument', {} );
+	svgEditor.trigger( sender, 'editor.action.formatDocument', {} );
 	const svgSource = editor.create( document.getElementById( 'source' ), {
 		renderWhitespace: 'boundary',
 		codeLens: false,
+		lineDecorationsWidth: 0,
+		automaticLayout: true,
 		lineNumbers: 'off',
 		minimap: {
 			enabled: false
@@ -76,14 +82,12 @@ const storage = localStorage;
 	} );
 	svgSource.getModel().updateOptions( options );
 
-	fromEvent( window, 'resize', { passive: true } )
-	.pipe(
-		startWith( {} ),
-		debounceTime( 10 ) )
-	.subscribe( () => {
-		svgEditor.layout();
-		svgSource.layout();
+	fromEvent( document.querySelector( 'button[data-command="copy"]' ), 'click' )
+	.subscribe( e => {
+		e.preventDefault();
+		svgSource.trigger( sender, 'editor.action.clipboardCopyAction', {} );
 	} );
+
 
 	const content = new Observable<string>( observer => {
 		observer.next( model.getValue() );
@@ -111,5 +115,4 @@ const storage = localStorage;
 		( document.getElementById( 'image' ) as HTMLImageElement ).src = url;
 		svgSource.setValue( url );
 	} );
-
 } )();

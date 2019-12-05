@@ -13,6 +13,7 @@
 		"build": "concurrently yarn:build:main yarn:build:worker"
 	},
 	"devDependencies": {
+		"@fortawesome/fontawesome-free": "^5.11.2",
 		"concurrently": "^5.0.0",
 		"gh-pages": "^2.1.1",
 		"monaco-editor": "^0.18.1",
