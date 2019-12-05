@@ -1,6 +1,41 @@
-import { editor } from 'monaco-editor';
+import { editor, languages } from 'monaco-editor';
 import { fromEvent, Observable } from 'rxjs';
 import { shareReplay, debounceTime, startWith, skip, distinctUntilChanged, retryWhen, delay, map } from 'rxjs/operators';
+
+import { V2XmlFormatter } from '~../lib/vscode-xml/src/formatting/formatters';
+
+const formatter = new V2XmlFormatter;
+const formatterOptions = {
+	removeCommentsOnMinify: false,
+	splitAttributesOnFormat: false,
+	splitXmlnsOnFormat: false,
+	enforcePrettySelfClosingTagOnFormat: true,
+	newLine: '\n'
+};
+
+languages.registerDocumentRangeFormattingEditProvider( 'xml', {
+	provideDocumentRangeFormattingEdits( model, range, editorOptions ) {
+		return [ {
+			range,
+			text: formatter.formatXml( model.getValueInRange( range ), {
+				...formatterOptions,
+				editorOptions
+			} )
+		} ];
+	}
+} );
+languages.registerDocumentFormattingEditProvider( 'xml', {
+	provideDocumentFormattingEdits( model, editorOptions ) {
+		return [ {
+			range: model.getFullModelRange(),
+			text: formatter.formatXml( model.getValue(), {
+				...formatterOptions,
+				editorOptions
+			} )
+		} ];
+	}
+} );
+
 const options = {
 	tabSize: 2,
 	indentSize: 2,
@@ -23,14 +58,12 @@ const storage = localStorage;
 		value: storage.getItem( 'content' ) ?? `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 </svg>
 `,
-		formatOnPaste: true,
-		formatOnType: true,
 		language: 'xml',
 		renderWhitespace: 'boundary'
 	} );
 	const model = svgEditor.getModel();
 	model.updateOptions( options );
-
+	svgEditor.trigger( 'index.ts', 'editor.action.formatDocument', {} );
 	const svgSource = editor.create( document.getElementById( 'source' ), {
 		renderWhitespace: 'boundary',
 		codeLens: false,
