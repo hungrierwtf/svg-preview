@@ -7,12 +7,15 @@
 		"deploy": "gh-pages -t -d dist",
 		"dist": "yarn clean && yarn build && yarn deploy",
 		"dev": "parcel src/index.html",
-		"build": "parcel build src/index.html --public-url ./ && nodetouch dist/.nojekyll"
+		"build:worker:editor": "parcel build node_modules/monaco-editor/esm/vs/editor/editor.worker.js --no-source-maps",
+		"build:worker": "concurrently yarn:build:worker:*",
+		"build:main": "parcel build src/index.html --public-url ./ && nodetouch dist/.nojekyll",
+		"build": "concurrently yarn:build:main yarn:build:worker"
 	},
 	"devDependencies": {
+		"concurrently": "^5.0.0",
 		"gh-pages": "^2.1.1",
 		"monaco-editor": "^0.18.1",
-		"monaco-languages": "^1.8.0",
 		"normalize-scss": "^7.0.1",
 		"parcel-bundler": "^1.12.4",
 		"rimraf": "^3.0.0",

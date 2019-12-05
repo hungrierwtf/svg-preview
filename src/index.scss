@@ -1,6 +1,6 @@
 @import "~normalize-scss";
 html, body { margin: 0; padding: 0; }
-#panes { height: 100vh; width: 100vw; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 3fr 1fr;
+#panes { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 3fr 1fr;
 	#editor { grid-column: 1; grid-row: 1 / span 2; }
 	#image { grid-column: 2; grid-row: 1; }
 	#source { grid-column: 2; grid-row: 2; }

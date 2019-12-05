@@ -1,12 +1,19 @@
 import { editor } from 'monaco-editor';
 import { fromEvent, Observable } from 'rxjs';
-import { shareReplay, debounceTime, startWith, skip } from 'rxjs/operators';
-import 'monaco-languages/release/esm/xml/xml.contribution';
+import { shareReplay, debounceTime, startWith, skip, distinctUntilChanged, retryWhen, delay, map } from 'rxjs/operators';
 const options = {
 	tabSize: 2,
 	indentSize: 2,
 	insertSpaces: false,
 	trimAutoWhitespace: true
+};
+
+self[ 'MonacoEnvironment' ] = {
+	getWorkerUrl( moduleId, label ) {
+		switch( label ) {
+		default: return './editor.worker.js';
+		}
+	}
 };
 
 const storage = localStorage;
@@ -16,6 +23,8 @@ const storage = localStorage;
 		value: storage.getItem( 'content' ) ?? `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 </svg>
 `,
+		formatOnPaste: true,
+		formatOnType: true,
 		language: 'xml',
 		renderWhitespace: 'boundary'
 	} );
@@ -49,20 +58,25 @@ const storage = localStorage;
 			observer.next( model.getValue() );
 		} );
 		return () => {};
-	} ).pipe( shareReplay( 1 ) );
+	} ).pipe( shareReplay( 1 ), distinctUntilChanged(), debounceTime( 10 ) );
 
 	content
-	.pipe( skip( 1 ), debounceTime( 10 ) )
+	.pipe( skip( 1 ) )
 	.subscribe( c => {
 		storage.setItem( 'content', c );
 	} );
 
 	content
-	.pipe( debounceTime( 10 ) )
-	.subscribe( e => {
-		const dataUrl = 'data:image/svg+xml;base64,' + btoa( e );
-		( document.getElementById( 'image' ) as HTMLImageElement ).src = dataUrl;
-		svgSource.setValue( dataUrl );
+	.pipe(
+		map( str => ( new DOMParser ).parseFromString( str, 'image/svg+xml' ) ),
+		map( doc => ( new XMLSerializer ).serializeToString( doc ) ),
+		map( str => 'data:image/svg+xml;base64,' + btoa( str ) ),
+		distinctUntilChanged(),
+		retryWhen( e => e.pipe( delay( 100 ) ) )
+	)
+	.subscribe( url => {
+		( document.getElementById( 'image' ) as HTMLImageElement ).src = url;
+		svgSource.setValue( url );
 	} );
 
 } )();
