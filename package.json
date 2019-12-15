@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"scripts": {
 		"clean": "rimraf dist",
-		"deploy": "gh-pages -t -n -d dist",
+		"deploy": "gh-pages -t -d dist",
 		"dist": "yarn clean && yarn build && yarn deploy",
 		"dev": "parcel src/index.html",
 		"build:worker:editor": "parcel build node_modules/monaco-editor/esm/vs/editor/editor.worker.js --no-source-maps",
