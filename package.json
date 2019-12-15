@@ -28,5 +28,8 @@
 			"post-merge": "yarnhook",
 			"post-rewrite": "yarnhook"
 		}
+	},
+	"dependencies": {
+		"@fortawesome/fontawesome-free": "^5.12.0"
 	}
 }
