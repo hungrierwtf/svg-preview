@@ -1,0 +1,33 @@
+name: gh-pages
+on:
+  push:
+    branches:
+    - master
+env:
+  CI: true
+jobs:
+  dist:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 13.x
+    - run: |
+        username="$(git --no-pager log --format=format:'%an' -n 1)"
+        email="$(git --no-pager log --format=format:'%ae' -n 1)"
+        git config --local user.name "$username"
+        git config --local user.email "$email"
+        git config --local protocol.version 2
+        git submodule update --init --force --recursive --depth=1
+        git checkout -b gh-pages
+        yarn install
+        yarn run build
+        git rm -fr --cached .
+        mv .git dist
+        cd dist
+        touch .nojekyll
+        git add . -A
+        git commit -m "gh-pages"
+        git push --force --set-upstream origin gh-pages
+        mv .git ..
