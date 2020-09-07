@@ -1,3 +1,0 @@
-[submodule "lib/vscode-xml"]
-	path = lib/vscode-xml
-	url = https://github.com/DotJoshJohnson/vscode-xml
